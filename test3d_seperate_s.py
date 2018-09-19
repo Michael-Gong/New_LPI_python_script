@@ -48,7 +48,7 @@ def processplot(n):
   #stop    =  30  # end time
   #step    =  1  # the interval or step
   
-  youwant = ['Electron_ekbar','Electron_density','Ion_density','Ion_ekbar','ex','ey','bz','ex_averaged','ey_averaged','bz_averaged']
+  youwant = ['Electron_density','Ion_density','Electron_ekbar','Ion_ekbar','ex','ey','bz','ex_averaged','ey_averaged','bz_averaged']
   #youwant =  ['ey','ex','ey_averaged','bz','bz_averaged'] #,'electron_en','electron_ekbar','electron_density']
   #youwant.append('Ion_ekbar')
   #youwant.append('positron_ekbar')
@@ -86,11 +86,13 @@ def processplot(n):
               if np.min(ex.T) == np.max(ex.T):
                   continue
               eee=np.max([-np.min(ex.T),np.max(ex.T)])
-              if (name == 'ex') or (name == 'ex_averaged'):
-                  eee = 60
+              if (name == 'ex'):
+                  eee = 50
+              elif  (name == 'ex_averaged'):
+                  eee = 30
               elif (name == 'ey') or (name == 'bz'):
                   eee = 380 
-              elif (name == 'ey_averaged') or (name == 'bz_averaged'):
+              elif (name == 'ey_averaged') or (name == 'ez_averaged'):
                   eee = 30
               levels = np.linspace(-eee, eee, 40)
               plt.contourf(X, Y, ex.T, levels=levels, norm=mcolors.Normalize(vmin=-eee, vmax=eee), cmap=cm.bwr)
@@ -119,11 +121,9 @@ def processplot(n):
               if np.min(ex.T) == np.max(ex.T):
                   continue
               eee=np.max([-np.min(ex.T),np.max(ex.T)])
-              if (name == 'ex') or (name == 'ex_averaged'):
-                  eee = 60
-              elif (name == 'ey') or (name == 'bz'):
+              if (name == 'ey') or (name == 'bz'):
                   eee = 380 
-              elif (name == 'ey_averaged') or (name == 'bz_averaged'):
+              elif (name == 'by_averaged') or (name == 'bz_averaged'):
                   eee = 30
               levels = np.linspace(-eee, eee, 40)
               plt.contourf(X, Y, ex.T, levels=levels, norm=mcolors.Normalize(vmin=-eee, vmax=eee), cmap=cm.bwr)
@@ -177,15 +177,15 @@ def processplot(n):
               x  = data['Grid/Grid_mid'].data[0]/1.0e-6
               y  = data['Grid/Grid_mid'].data[1]/1.0e-6
               X, Y = np.meshgrid(x, y)
-              ddeen = data['Derived/EkBar/'+name[0:-6]].data/(q0*1.0e6)
+              ddeen = data['Derived/EkBar_averaged/'+name[0:-6]].data/(q0*1.0e6)
               n3d=len(ddeen[0,0,:])
               den = (ddeen[:,:,n3d//2-1]+ddeen[:,:,n3d//2])/2
               if np.min(den.T) == np.max(den.T):
                   continue
               eee=np.max(den.T)
-              if (name == 'Ion_ekbar'):
+              if (name == 'Ion_ekbar_averaged'):
                   eee = 400
-              elif name == 'Electron_ekbar':
+              elif name == 'Electron_ekbar_averaged':
                   eee = 800
               levels = np.logspace(-1, np.log10(eee), 40) 
               plt.contourf(X, Y, den.T, levels=levels,norm=colors.LogNorm(vmin=0.1, vmax=eee), cmap=cm.nipy_spectral)
@@ -272,11 +272,11 @@ def processplot(n):
   return 0
 
 if __name__ == '__main__':
-  start   =  1  # start time
-  stop    =  30  # end time
+  start   =  3 # start time
+  stop    =  31  # end time
   step    =  1  # the interval or step
     
   inputs = range(start,stop+step,step)
-  pool = mp.Pool(processes=15)
+  pool = mp.Pool(processes=10)
   results = pool.map(processplot,inputs)
   print(results)
